@@ -1,0 +1,407 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>💵 Dollar Bill Cashier Game for Kids!</title>
+    <style>
+        :root {
+            --bill-green: #85bb65;
+            --dark-green: #2e7d32;
+            --light-green: #e8f5e9;
+            --gold: #ffb300;
+        }
+
+        body {
+            font-family: 'Comic Sans MS', 'Chalkboard SE', 'Arial Rounded MT Bold', sans-serif;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            user-select: none;
+        }
+
+        .game-container {
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 15px 35px rgba(0,0,0,0.15);
+            width: 100%;
+            max-width: 750px;
+            padding: 25px;
+            text-align: center;
+            border: 5px solid #4caf50;
+        }
+
+        h1 {
+            color: #2e7d32;
+            margin-top: 0;
+            font-size: 2.2rem;
+            text-shadow: 2px 2px #c8e6c9;
+        }
+
+        /* Stats Bar */
+        .stats-bar {
+            display: flex;
+            justify-content: space-around;
+            background: #fff3e0;
+            padding: 10px;
+            border-radius: 15px;
+            margin-bottom: 20px;
+            font-size: 1.2rem;
+            font-weight: bold;
+            color: #e65100;
+            border: 2px dashed #ff9800;
+        }
+
+        /* Cash Register Target Display */
+        .register-screen {
+            background: #263238;
+            color: #76ff03;
+            font-family: 'Courier New', Courier, monospace;
+            padding: 15px;
+            border-radius: 15px;
+            font-size: 2rem;
+            font-weight: bold;
+            box-shadow: inset 0 0 10px #000;
+            margin-bottom: 20px;
+            display: flex;
+            justify-content: space-around;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .register-screen span {
+            color: #ffffff;
+            font-size: 1.2rem;
+            display: block;
+        }
+
+        /* Tray for selected bills */
+        .tray-area {
+            background: var(--light-green);
+            border: 3px dashed var(--dark-green);
+            border-radius: 15px;
+            min-height: 90px;
+            margin-bottom: 20px;
+            padding: 10px;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .tray-placeholder {
+            color: #81c784;
+            font-size: 1.2rem;
+            font-style: italic;
+        }
+
+        /* Bill Buttons Grid */
+        .bills-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 12px;
+            margin-bottom: 25px;
+        }
+
+        /* Play Money Styling */
+        .bill {
+            background: linear-gradient(180deg, #b2d8b2 0%, #85bb65 100%);
+            border: 3px solid #1b5e20;
+            border-radius: 10px;
+            height: 60px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-size: 1.5rem;
+            font-weight: bold;
+            color: #0b3c11;
+            cursor: pointer;
+            box-shadow: 0 4px 0 #1b5e20;
+            transition: all 0.1s;
+            position: relative;
+        }
+
+        .bill:before {
+            content: "💵";
+            font-size: 1rem;
+            position: absolute;
+            left: 5px;
+            top: 5px;
+        }
+
+        .bill:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 0 #1b5e20;
+        }
+
+        .bill:active {
+            transform: translateY(4px);
+            box-shadow: 0 0 0 #1b5e20;
+        }
+
+        /* Mini bills in tray */
+        .mini-bill {
+            background: #85bb65;
+            border: 2px solid #1b5e20;
+            border-radius: 6px;
+            padding: 5px 10px;
+            font-weight: bold;
+            color: #0b3c11;
+            cursor: pointer;
+            animation: popIn 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        .mini-bill:hover {
+            background: #ff8a80;
+            border-color: #b71c1c;
+            color: white;
+        }
+
+        @keyframes popIn {
+            0% { transform: scale(0); }
+            100% { transform: scale(1); }
+        }
+
+        /* Action Buttons */
+        .controls {
+            display: flex;
+            gap: 15px;
+            justify-content: center;
+        }
+
+        .btn {
+            padding: 12px 25px;
+            font-size: 1.3rem;
+            font-weight: bold;
+            border: none;
+            border-radius: 12px;
+            cursor: pointer;
+            transition: 0.1s;
+        }
+
+        .btn-check {
+            background: #4caf50;
+            color: white;
+            box-shadow: 0 5px 0 #2e7d32;
+        }
+
+        .btn-clear {
+            background: #f44336;
+            color: white;
+            box-shadow: 0 5px 0 #b71c1c;
+        }
+
+        .btn:hover {
+            filter: brightness(1.1);
+        }
+
+        .btn:active {
+            transform: translateY(4px);
+            box-shadow: none;
+        }
+
+        /* Message Overlay / Feedback */
+        .feedback {
+            margin-top: 15px;
+            font-size: 1.4rem;
+            font-weight: bold;
+            min-height: 35px;
+        }
+    </style>
+</head>
+<body>
+
+<div class="game-container">
+    <h1>🛒 Kids Dollar Shop! 💵</h1>
+    
+    <div class="stats-bar">
+        <div>⭐ Score: <span id="score">0</span></div>
+        <div>🔥 Streak: <span id="streak">0</span></div>
+    </div>
+
+    <!-- Cash Register Screen -->
+    <div class="register-screen">
+        <div>
+            <span>TARGET PRICE</span>
+            $<span id="target-amount">0</span>
+        </div>
+        <div>
+            <span>YOUR MONEY</span>
+            $<span id="current-amount">0</span>
+        </div>
+    </div>
+
+    <div style="font-size: 0.9rem; color: #666; margin-bottom: 5px;">
+        (Click a bill below to add it. Click a bill in the green box to remove it!)
+    </div>
+
+    <!-- Money Tray (Selected Bills) -->
+    <div class="tray-area" id="bill-tray">
+        <span class="tray-placeholder">Your selected bills will show up here!</span>
+    </div>
+
+    <!-- Bill Buttons Selection -->
+    <div class="bills-grid">
+        <button class="bill" onclick="addBill(1)">$1</button>
+        <button class="bill" onclick="addBill(5)">$5</button>
+        <button class="bill" onclick="addBill(10)">$10</button>
+        <button class="bill" onclick="addBill(20)">$20</button>
+        <button class="bill" onclick="addBill(50)">$50</button>
+        <button class="bill" onclick="addBill(100)">$100</button>
+    </div>
+
+    <!-- Action Controls -->
+    <div class="controls">
+        <button class="btn btn-clear" onclick="clearTray()">🗑️ Clear</button>
+        <button class="btn btn-check" onclick="checkAnswer()">✅ Pay Now</button>
+    </div>
+
+    <div class="feedback" id="feedback"></div>
+</div>
+
+<script>
+    // Game State
+    let target = 0;
+    let selectedBills = [];
+    let score = 0;
+    let streak = 0;
+
+    // Simple built-in browser sound effects
+    const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+    
+    function playTone(freq, type = 'sine', duration = 0.1) {
+        if (audioCtx.state === 'suspended') {
+            audioCtx.resume();
+        }
+        const osc = audioCtx.createOscillator();
+        const gain = audioCtx.createGain();
+        osc.type = type;
+        osc.frequency.setValueAtTime(freq, audioCtx.currentTime);
+        gain.gain.setValueAtTime(0.1, audioCtx.currentTime);
+        gain.gain.exponentialRampToValueAtTime(0.01, audioCtx.currentTime + duration);
+        osc.connect(gain);
+        gain.connect(audioCtx.destination);
+        osc.start();
+        osc.stop(audioCtx.currentTime + duration);
+    }
+
+    function playSuccessSound() {
+        playTone(523.25, 'triangle', 0.1); // C5
+        setTimeout(() => playTone(659.25, 'triangle', 0.1), 100); // E5
+        setTimeout(() => playTone(783.99, 'triangle', 0.2), 200); // G5
+    }
+
+    function playErrorSound() {
+        playTone(200, 'sawtooth', 0.2);
+    }
+
+    // Generate a new random target amount
+    function generateNewTarget() {
+        // Generates easy to medium realistic amounts (e.g., $3 to $85)
+        const commonAmounts = [
+            Math.floor(Math.random() * 15) + 1,                   // $1 - $15
+            Math.floor(Math.random() * 40) + 10,                  // $10 - $50
+            Math.floor((Math.random() * 90) + 10)                 // $10 - $100
+        ];
+        target = commonAmounts[Math.floor(Math.random() * commonAmounts.length)];
+        
+        document.getElementById('target-amount').innerText = target;
+        clearTray();
+    }
+
+    // Add a bill
+    function addBill(value) {
+        playTone(400, 'sine', 0.05);
+        selectedBills.push(value);
+        updateUI();
+    }
+
+    // Remove a single bill if clicked in the tray
+    function removeBill(index) {
+        playTone(300, 'sine', 0.05);
+        selectedBills.splice(index, 1);
+        updateUI();
+    }
+
+    // Clear all bills
+    function clearTray() {
+        selectedBills = [];
+        updateUI();
+        document.getElementById('feedback').innerText = "";
+    }
+
+    // Update screen and calculations
+    function updateUI() {
+        const tray = document.getElementById('bill-tray');
+        const total = selectedBills.reduce((a, b) => a + b, 0);
+        document.getElementById('current-amount').innerText = total;
+
+        tray.innerHTML = "";
+        if (selectedBills.length === 0) {
+            tray.innerHTML = '<span class="tray-placeholder">Your selected bills will show up here!</span>';
+        } else {
+            selectedBills.forEach((bill, index) => {
+                const billElem = document.createElement('div');
+                billElem.className = 'mini-bill';
+                billElem.innerText = `$${bill} ✕`;
+                billElem.title = "Click to remove";
+                billElem.onclick = () => removeBill(index);
+                tray.appendChild(billElem);
+            });
+        }
+    }
+
+    // Check if the kid got the right answer
+    function checkAnswer() {
+        const total = selectedBills.reduce((a, b) => a + b, 0);
+        const feedback = document.getElementById('feedback');
+
+        if (total === 0) {
+            feedback.style.color = "#f44336";
+            feedback.innerText = "⚠️ Add some bills first!";
+            playErrorSound();
+            return;
+        }
+
+        if (total === target) {
+            // Correct
+            playSuccessSound();
+            score += 10;
+            streak += 1;
+            feedback.style.color = "#2e7d32";
+            feedback.innerText = "🎉 AWESOME! Exact Change! +10 Points!";
+            document.getElementById('score').innerText = score;
+            document.getElementById('streak').innerText = streak;
+
+            setTimeout(() => {
+                generateNewTarget();
+            }, 1500);
+
+        } else if (total < target) {
+            // Too little
+            playErrorSound();
+            feedback.style.color = "#e65100";
+            feedback.innerText = `📉 Need $${target - total} more! Keep going!`;
+            streak = 0;
+            document.getElementById('streak').innerText = streak;
+        } else {
+            // Too much
+            playErrorSound();
+            feedback.style.color = "#d32f2f";
+            feedback.innerText = `📈 Oops, that's $${total - target} too much! Click a bill to take it out.`;
+            streak = 0;
+            document.getElementById('streak').innerText = streak;
+        }
+    }
+
+    // Start Game on load
+    generateNewTarget();
+</script>
+
+</body>
+</html>
